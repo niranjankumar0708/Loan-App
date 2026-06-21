@@ -11,6 +11,7 @@ import {
 
 export default function LandingPage({ onApplyClick }) {
   const [products, setProducts] = useState([])
+  const [selectedSchemes, setSelectedSchemes] = useState({})
 
   useEffect(() => {
     getLoanProducts().then(data => setProducts(data))
@@ -31,6 +32,28 @@ export default function LandingPage({ onApplyClick }) {
     <div className="landing-page">
       {/* 1. Hero Section */}
       <section id="hero" className="hero-section">
+        {/* 3D Floating Advertisement Cards in Background */}
+        <div className="hero-ads-background" aria-hidden="true">
+          <div className="ad-card-3d ad-card-left">
+            <div className="ad-card-glow-green"></div>
+            <img src="/images/card_ad.png" alt="AeroCard Premium" />
+            <div className="ad-card-body">
+              <span className="ad-card-tag">AEROCARD</span>
+              <h5>3% Loan Cashbacks</h5>
+              <p>Apply for premium card.</p>
+            </div>
+          </div>
+          <div className="ad-card-3d ad-card-right">
+            <div className="ad-card-glow-violet"></div>
+            <img src="/images/investment_ad.png" alt="Aero Invest" />
+            <div className="ad-card-body">
+              <span className="ad-card-tag" style={{ background: 'rgba(168, 85, 247, 0.15)', color: '#c084fc', border: '1px solid rgba(168, 85, 247, 0.25)' }}>HIGH-YIELD</span>
+              <h5>5.2% APY Growth</h5>
+              <p>Lock in compound yields.</p>
+            </div>
+          </div>
+        </div>
+
         <div className="hero-content">
           <span className="glass-badge">
             <ShieldCheck size={14} style={{ color: 'var(--accent-color)' }} />
@@ -107,37 +130,74 @@ export default function LandingPage({ onApplyClick }) {
         </div>
 
         <div className="products-grid">
-          {products.map((product) => (
-            <GlassCard key={product.id} className="product-card" style={{ display: 'flex', flexDirection: 'column' }}>
-              <div className="product-icon">
-                {getProductIcon(product.id)}
-              </div>
-              <h3 className="product-title">{product.title}</h3>
-              <p className="product-desc">{product.description || `Optimized loan structures for your core ${product.title.toLowerCase()} goals.`}</p>
-              
-              <div className="product-meta">
-                <span className="product-rate-lbl">Rate of Interest</span>
-                <span className="product-rate-val">{product.rate}</span>
-              </div>
+          {products.map((product) => {
+            const activeSchemeIdx = selectedSchemes[product.id] ?? 0;
+            const activeScheme = product.schemes?.[activeSchemeIdx];
+            const displayRate = activeScheme ? activeScheme.rate : product.rate;
 
-              <ul className="product-features">
-                {product.features?.map((feature, i) => (
-                  <li key={i}>
-                    <Check size={14} />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
+            return (
+              <GlassCard key={product.id} className={`product-card product-card-${product.id}`} style={{ display: 'flex', flexDirection: 'column' }}>
+                {product.image && (
+                  <div className="product-image-wrap">
+                    <img src={product.image} alt={product.title} className="product-image" />
+                  </div>
+                )}
+                
+                <div className="product-header-row">
+                  <div className={`product-icon icon-${product.id}`}>
+                    {getProductIcon(product.id)}
+                  </div>
+                  <h3 className="product-title">{product.title}</h3>
+                </div>
+                
+                <p className="product-desc">{product.description || `Optimized loan structures for your core ${product.title.toLowerCase()} goals.`}</p>
+                
+                <div className="product-meta">
+                  <span className="product-rate-lbl">Rate of Interest</span>
+                  <span className="product-rate-val">{displayRate}</span>
+                </div>
 
-              <button 
-                onClick={() => onApplyClick(product.id)} 
-                className="glass-btn glass-btn-primary"
-                style={{ width: '100%', marginTop: 'auto' }}
-              >
-                Apply for {product.title.split(' ')[0]}
-              </button>
-            </GlassCard>
-          ))}
+                <ul className="product-features">
+                  {product.features?.map((feature, i) => (
+                    <li key={i}>
+                      <Check size={14} />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+
+                {product.schemes && (
+                  <div className="product-schemes-section">
+                    <span className="schemes-section-title">Available Schemes</span>
+                    <div className="schemes-tabs">
+                      {product.schemes.map((scheme, idx) => (
+                        <button
+                          key={idx}
+                          className={`scheme-tab ${activeSchemeIdx === idx ? 'active' : ''}`}
+                          onClick={() => setSelectedSchemes(prev => ({ ...prev, [product.id]: idx }))}
+                        >
+                          {scheme.name}
+                        </button>
+                      ))}
+                    </div>
+                    {activeScheme && (
+                      <div className="scheme-desc-box">
+                        <p>{activeScheme.desc}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <button 
+                  onClick={() => onApplyClick(product.id)} 
+                  className="glass-btn glass-btn-primary"
+                  style={{ width: '100%', marginTop: 'auto' }}
+                >
+                  Apply for {product.title.split(' ')[0]}
+                </button>
+              </GlassCard>
+            );
+          })}
         </div>
       </section>
 

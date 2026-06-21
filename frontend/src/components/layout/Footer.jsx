@@ -50,7 +50,7 @@ export default function Footer() {
       </div>
 
       <div className="footer-bottom">
-        <p>&copy; {new Date().getFullYear()} AeroPay. Made with 🤍 for next-gen credit.</p>
+        <p>&copy; {new Date().getFullYear()} AeroPay. All rights reserved.</p>
         <div className="footer-bottom-links">
           <a href="#" className="footer-link">Privacy Policy</a>
           <a href="#" className="footer-link">Terms of Service</a>

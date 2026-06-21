@@ -24,6 +24,9 @@
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
         <div class="blob blob-3"></div>
+        <div class="blob blob-4"></div>
+        <div class="blob blob-5"></div>
+        <div class="finance-bg-graphic"></div>
       </div>
 
       <!-- Floating Glass Navbar -->
@@ -52,154 +55,140 @@
           </button>
         </div>
       </nav>
-      <!-- Active Loan Dashboard (appears when loan is approved) -->
+      <!-- Active Loan Dashboard (appears when loan is approved or history exists) -->
       <div id="active-loan-dashboard-wrapper" style="display: none; padding: 2rem 5% 0 5%; max-width: 1200px; margin: 8rem auto 0 auto; animation: modal-enter 0.5s ease-out;">
-        <div class="glass-card" id="active-loan-banner" style="border: 1px solid rgba(0, 255, 135, 0.25); background: rgba(0, 255, 135, 0.01); box-shadow: 0 8px 32px 0 rgba(0, 255, 135, 0.04); padding: 1.5rem; cursor: pointer;">
-          
-          <!-- Collapsed Header Banner -->
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-            <div style="display: flex; align-items: center; gap: 0.8rem;">
-              <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(0, 255, 135, 0.1); color: #00ff87; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                <i data-lucide="landmark"></i>
-              </div>
-              <div>
-                <h3 style="font-size: 1.05rem; font-weight: 700; font-family: var(--font-family-title); display: flex; align-items: center; gap: 0.5rem;">
-                  Active Loan Portal
-                  <span id="dash-status-badge" class="glass-badge" style="background: rgba(0, 255, 135, 0.1); color: #00ff87; border: 1px solid rgba(0, 255, 135, 0.2); font-size: 0.7rem; padding: 0.15rem 0.5rem;">
-                    ● pending disbursal
-                  </span>
-                </h3>
-                <p style="font-size: 0.8rem; color: var(--text-secondary);">
-                  Ref: <span id="dash-ref-short" style="color: var(--text-primary); font-weight: 600;">AP-00000</span> • 
-                  Principal: <span id="dash-amount-short" style="color: var(--text-primary); font-weight: 600;">$0</span> • 
-                  Term: <span id="dash-tenure-short" style="color: var(--text-primary); font-weight: 600;">0</span> Months
-                </p>
-              </div>
-            </div>
-            
-            <div style="display: flex; align-items: center; gap: 1rem;" onclick="event.stopPropagation();">
-              <div style="text-align: right; fontSize: 0.85rem;" class="quick-balance-display">
-                <span style="color: var(--text-secondary);">Outstanding: </span>
-                <span style="font-weight: 700; color: #ff007f;" id="dash-balance-short">$0</span>
-              </div>
+        
+        <!-- Container for active loan cards (rendered dynamically) -->
+        <div id="active-loans-container"></div>
 
-              <button 
-                id="dash-expand-toggle-btn"
-                style="background: transparent; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; padding: 0.4rem;"
-                aria-label="Expand details"
-              >
-                <i data-lucide="chevron-down" id="dash-chevron"></i>
-              </button>
-              
-              <button 
-                id="reset-loan-btn"
-                style="background: transparent; border: none; color: #ff007f; cursor: pointer; display: flex; align-items: center; gap: 0.3rem; font-size: 0.8rem; padding: 0.4rem 0.6rem; border-radius: 8px;"
-                class="table-row-hover"
-              >
-                <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i>
-                Reset
-              </button>
-            </div>
+        <!-- Repayment Ledger & Past Loans -->
+        <div class="glass-card" id="past-loans-ledger-card" style="border: 1px solid rgba(0, 242, 254, 0.25); background: rgba(0, 242, 254, 0.01); box-shadow: 0 8px 32px 0 rgba(0, 242, 254, 0.04); padding: 1.5rem; margin-top: 2rem; display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+            <h3 style="font-size: 1.1rem; font-weight: 700; font-family: var(--font-family-title); display: flex; align-items: center; gap: 0.6rem; margin: 0;">
+              <i data-lucide="clock" style="color: #00f2fe; width: 20px; height: 20px;"></i>
+              Repayment Ledger & Past Loans
+            </h3>
+            <button 
+              id="clear-past-loans-btn"
+              style="background: transparent; border: none; color: #ff007f; cursor: pointer; display: flex; align-items: center; gap: 0.3rem; font-size: 0.8rem; padding: 0.4rem 0.6rem; border-radius: 8px;"
+              class="table-row-hover"
+            >
+              <i data-lucide="trash-2" style="width: 12px; height: 12px;"></i>
+              Clear History
+            </button>
           </div>
 
-          <!-- Expanded Details Section -->
-          <div id="active-loan-expanded-body" style="display: none; margin-top: 2rem; border-top: 1px solid var(--glass-border); padding-top: 2rem; animation: modal-enter 0.4s ease-out;">
-            <!-- Specs Grid -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 2.5rem;">
-              <div>
-                <span style="font-size: 0.78rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Sanctioned Principal</span>
-                <h4 style="font-size: 1.6rem; font-weight: 800; margin-top: 0.2rem; color: var(--text-primary);" id="dash-amount">$0</h4>
-              </div>
-              <div>
-                <span style="font-size: 0.78rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Monthly Installment (EMI)</span>
-                <h4 style="font-size: 1.6rem; font-weight: 800; margin-top: 0.2rem; color: var(--accent-color);" id="dash-emi">$0</h4>
-              </div>
-              <div>
-                <span style="font-size: 0.78rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Rate of Interest</span>
-                <h4 style="font-size: 1.6rem; font-weight: 800; margin-top: 0.2rem; color: var(--text-primary);" id="dash-rate">0% p.a.</h4>
-              </div>
-              <div>
-                <span style="font-size: 0.78rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em;">Total Term Length</span>
-                <h4 style="font-size: 1.6rem; font-weight: 800; margin-top: 0.2rem; color: var(--text-primary);" id="dash-tenure">0 Months</h4>
-              </div>
-            </div>
-
-            <!-- Repayments & Progress Columns -->
-            <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 2rem; flex-wrap: wrap;" id="dash-detail-columns">
-              <!-- Repayment Panel -->
-              <div style="background: rgba(255, 255, 255, 0.01); border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.2rem;" onclick="event.stopPropagation();">
-                <h4 style="font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; font-family: var(--font-family-title);">
-                  <i data-lucide="credit-card" style="color: var(--accent-color); width: 16px; height: 16px;"></i>
-                  Pending Repayment Summary
-                </h4>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                  <div>
-                    <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">Remaining Balance</span>
-                    <p style="font-size: 1.4rem; font-weight: 700; color: #ff007f; margin-top: 0.1rem;" id="dash-balance">$0</p>
-                  </div>
-                  <div>
-                    <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">EMIs Settled</span>
-                    <p style="font-size: 1.4rem; font-weight: 700; margin-top: 0.1rem;" id="dash-settled-count">0 / 0 Paid</p>
-                  </div>
-                </div>
-
-                <div style="border-top: 1px solid var(--glass-border); padding-top: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                  <div>
-                    <span style="font-size: 0.75rem; color: var(--text-secondary);">Next EMI Installment Due</span>
-                    <p style="font-size: 0.95rem; font-weight: 600; color: var(--text-primary);" id="dash-next-due">July 20, 2026</p>
-                  </div>
-
-                  <button 
-                    id="pay-emi-btn"
-                    class="glass-btn glass-btn-primary"
-                    style="padding: 0.6rem 1.2rem; font-size: 0.85rem;"
-                  >
-                    <i data-lucide="sparkles" style="width: 14px; height: 14px; margin-right: 4px;"></i>
-                    Pay EMI
-                  </button>
-                </div>
-              </div>
-
-              {/* Disbursal Tracker */}
-              <div style="background: rgba(255, 255, 255, 0.01); border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.5rem;" onclick="event.stopPropagation();">
-                <h4 style="font-size: 0.95rem; font-weight: 700; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.5rem; font-family: var(--font-family-title);">
-                  <i data-lucide="file-text" style="width: 16px; height: 16px; color: var(--accent-color);"></i>
-                  Disbursal Progress
-                </h4>
-                
-                <div style="display: flex; flex-direction: column; gap: 1rem;" id="dash-disbursal-steps">
-                  <div style="display: flex; align-items: center; gap: 0.6rem;">
-                    <i data-lucide="check-circle-2" style="color: #00ff87; width: 16px; height: 16px;"></i>
-                    <span style="font-size: 0.85rem; font-weight: 600;">1. Credit FICO Verified</span>
-                  </div>
-
-                  <div style="display: flex; align-items: center; gap: 0.6rem;">
-                    <i data-lucide="check-circle-2" style="color: #00ff87; width: 16px; height: 16px;"></i>
-                    <span style="font-size: 0.85rem; font-weight: 600;">2. Terms E-Signed</span>
-                  </div>
-
-                  <div style="display: flex; align-items: center; gap: 0.6rem;">
-                    <div style="width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--accent-color); border-top-color: transparent; animation: spin 1s infinite linear; flex-shrink: 0;"></div>
-                    <span style="font-size: 0.85rem; font-weight: 600; color: var(--accent-color);">3. Disbursal Bank Transfer</span>
-                  </div>
-
-                  <div style="display: flex; align-items: center; gap: 0.6rem;">
-                    <i data-lucide="alert-circle" style="color: var(--text-secondary); width: 16px; height: 16px;"></i>
-                    <span style="font-size: 0.85rem; color: var(--text-secondary);">4. Funded (Money in Bank)</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; min-width: 600px;">
+              <thead>
+                <tr style="border-bottom: 1px solid var(--glass-border); padding-bottom: 0.8rem;">
+                  <th style="padding: 0.8rem 1rem; font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Reference</th>
+                  <th style="padding: 0.8rem 1rem; font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Loan Type</th>
+                  <th style="padding: 0.8rem 1rem; font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Principal</th>
+                  <th style="padding: 0.8rem 1rem; font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">EMI (Rate)</th>
+                  <th style="padding: 0.8rem 1rem; font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Tenure</th>
+                  <th style="padding: 0.8rem 1rem; font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600;">Settled Date</th>
+                  <th style="padding: 0.8rem 1rem; font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 600; text-align: right;">Status</th>
+                </tr>
+              </thead>
+              <tbody id="past-loans-table-body">
+                <!-- Injected via JavaScript -->
+              </tbody>
+            </table>
           </div>
-
         </div>
+
+        <!-- Exclusive Offers & Rewards Banners -->
+        <section id="offers" class="section" style="background: rgba(255,255,255,0.01); padding: 2rem 0; margin-top: 3rem; border-top: 1px solid var(--glass-border);">
+          <div class="section-header">
+            <span class="glass-badge">EXCLUSIVE OFFERS</span>
+            <h2 class="section-title">Premium Partner Rewards</h2>
+            <p class="section-subtitle">
+              Maximize your financial flexibility with our exclusive card cashbacks, high-yield compound plans, and bank integration perks.
+            </p>
+          </div>
+
+          <div class="offers-grid">
+            <div class="glass-card offer-card">
+              <span class="glass-badge offer-tag" style="background: rgba(0, 242, 254, 0.15); color: #00f2fe; border: 1px solid rgba(0, 242, 254, 0.25);">
+                EXCLUSIVE CREDIT
+              </span>
+              <div class="offer-image-wrap">
+                <img src="images/card_ad.png" alt="AeroCard Black" class="offer-image" />
+              </div>
+              <h3 class="offer-title">AeroCard Black Edition</h3>
+              <p class="offer-desc">
+                Get up to a $5,000 credit limit with 3% cashback on all loan EMI repayments and dining. Enjoy zero annual fees for your first year.
+              </p>
+              <button class="glass-btn glass-btn-primary offer-action-btn apply-trigger">
+                Apply for AeroCard
+                <i data-lucide="arrow-up-right" style="width: 14px; height: 14px;"></i>
+              </button>
+            </div>
+
+            <div class="glass-card offer-card">
+              <span class="glass-badge offer-tag" style="background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.25);">
+                HIGH-YIELD WEALTH
+              </span>
+              <div class="offer-image-wrap">
+                <img src="images/investment_ad.png" alt="Aero APY Growth" class="offer-image" />
+              </div>
+              <h3 class="offer-title">AeroGold Investment Plan</h3>
+              <p class="offer-desc">
+                Grow your compound savings at a guaranteed 5.2% APY with daily payouts. Fully liquid withdrawals with zero locking periods.
+              </p>
+              <a href="#calculator" class="glass-btn glass-btn-secondary offer-action-btn" style="border-color: var(--accent-color); text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                Calculate Yields
+                <i data-lucide="arrow-up-right" style="width: 14px; height: 14px;"></i>
+              </a>
+            </div>
+
+            <div class="glass-card offer-card">
+              <span class="glass-badge offer-tag" style="background: rgba(0, 255, 135, 0.15); color: #00ff87; border: 1px solid rgba(0, 255, 135, 0.25);">
+                FINANCE PLATINUM
+              </span>
+              <div class="offer-image-wrap">
+                <img src="images/bank_connect.png" alt="Bank Link Perks" class="offer-image" />
+              </div>
+              <h3 class="offer-title">AeroPay Bank Link Rewards</h3>
+              <p class="offer-desc">
+                Securely connect your primary bank account to receive an instant 0.5% APR discount on all active loan applications.
+              </p>
+              <button class="glass-btn glass-btn-secondary offer-action-btn apply-trigger">
+                Link Account Now
+                <i data-lucide="arrow-up-right" style="width: 14px; height: 14px;"></i>
+              </button>
+            </div>
+          </div>
+        </section>
+
       </div>
 
       <!-- Main Content -->
       <main>
         <!-- 1. Hero Section -->
         <section id="hero" class="hero-section">
+          <!-- 3D Floating Advertisement Cards in Background -->
+          <div class="hero-ads-background" aria-hidden="true">
+            <div class="ad-card-3d ad-card-left">
+              <div class="ad-card-glow-green"></div>
+              <img src="images/card_ad.png" alt="AeroCard Premium" />
+              <div class="ad-card-body">
+                <span class="ad-card-tag">AEROCARD</span>
+                <h5>3% Loan Cashbacks</h5>
+                <p>Apply for premium card.</p>
+              </div>
+            </div>
+            <div class="ad-card-3d ad-card-right">
+              <div class="ad-card-glow-violet"></div>
+              <img src="images/investment_ad.png" alt="Aero Invest" />
+              <div class="ad-card-body">
+                <span class="ad-card-tag" style="background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.25);">HIGH-YIELD</span>
+                <h5>5.2% APY Growth</h5>
+                <p>Lock in compound yields.</p>
+              </div>
+            </div>
+          </div>
           <div class="hero-content">
             <span class="glass-badge">
               <i data-lucide="shield-check" style="width: 14px; height: 14px; margin-right: 4px;"></i>
@@ -541,6 +530,8 @@
           </div>
         </section>
 
+
+
         <!-- 6. Testimonials Carousel Section -->
         <section class="section" style="background: rgba(255,255,255,0.01);">
           <div class="section-header">
@@ -651,7 +642,7 @@
         </div>
 
         <div class="footer-bottom">
-          <p>&copy; 2026 AeroPay. Made with 🤍 for next-gen credit.</p>
+          <p>&copy; 2026 AeroPay. All rights reserved.</p>
           <div class="footer-bottom-links">
             <a href="#" class="footer-link">Privacy Policy</a>
             <a href="#" class="footer-link">Terms of Service</a>
@@ -668,13 +659,13 @@
 
           <!-- Step Indicators -->
           <div class="wizard-progress-bar-container" id="wizard-progress-container">
-            <div class="wizard-progress-fill" id="wizard-progress-fill" style="width: 50%;"></div>
+            <div class="wizard-progress-fill" id="wizard-progress-fill" style="width: 33%;"></div>
           </div>
 
           <!-- Step 1 Details -->
           <div id="wizard-step-1">
             <div class="wizard-step-header">
-              <span class="glass-badge" style="margin-bottom: 0.5rem;">Step 1 of 2</span>
+              <span class="glass-badge" style="margin-bottom: 0.5rem;">Step 1 of 3</span>
               <h3 class="wizard-step-title">Personal Profile</h3>
               <p class="wizard-step-subtitle">Tell us about yourself to begin your application for credit.</p>
             </div>
@@ -723,12 +714,28 @@
           <!-- Step 2 Details -->
           <div id="wizard-step-2" style="display: none;">
             <div class="wizard-step-header">
-              <span class="glass-badge" style="margin-bottom: 0.5rem;">Step 2 of 2</span>
+              <span class="glass-badge" style="margin-bottom: 0.5rem;">Step 2 of 3</span>
               <h3 class="wizard-step-title">Financial Profile</h3>
               <p class="wizard-step-subtitle">Provide details regarding your current earnings and credit size.</p>
             </div>
 
             <div class="wizard-form-grid">
+              <div class="glass-input-group">
+                <label class="glass-input-label">Income Verification Method</label>
+                <div id="plaid-verified-banner" class="bank-verified-banner glass-panel" style="display: none;">
+                  <i data-lucide="check-circle-2" style="color: #00ff87; width: 20px; height: 20px;"></i>
+                  <div style="flex: 1;">
+                    <p style="font-weight: 700; color: #00ff87;" id="plaid-bank-name">Chase Connected Instantly</p>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary);">Verified income details auto-populated.</p>
+                  </div>
+                  <button id="plaid-disconnect-btn" class="plaid-disconnect-btn">Disconnect</button>
+                </div>
+                <button id="plaid-connect-btn" class="glass-btn bank-connector-trigger-btn" style="width: 100%; gap: 0.6rem; display: flex; align-items: center;">
+                  <i data-lucide="lock" style="color: #00f2fe; width: 16px; height: 16px;"></i>
+                  Connect Bank via Plaid (Instantly Verify Income)
+                </button>
+              </div>
+
               <div class="glass-input-group">
                 <label class="glass-input-label">Employment Status</label>
                 <div style="display: flex; gap: 1rem;">
@@ -779,25 +786,98 @@
                 Back
               </button>
               <button class="glass-btn glass-btn-primary" id="step2-next-btn">
-                Analyze Eligibility
+                Next Step
                 <i data-lucide="arrow-right" style="width: 16px; height: 16px; margin-left: 4px;"></i>
               </button>
             </div>
           </div>
 
-          <!-- Step 3 Details (Checking status loader) -->
+          <!-- Step 3 Details (KYC Upload) -->
           <div id="wizard-step-3" style="display: none;">
-            <div class="simulation-loading">
-              <div class="loading-ring"></div>
-              <h3 class="wizard-step-title" style="margin-top: 1rem;">Verifying Credit Status</h3>
-              <p class="wizard-step-subtitle" style="text-align: center; max-width: 380px;">
-                We are simulating a background credit pull (FICO check), evaluating monthly debt ratio, and calculating your optimized terms.
-              </p>
+            <div class="wizard-step-header">
+              <span class="glass-badge" style="margin-bottom: 0.5rem;">Step 3 of 3</span>
+              <h3 class="wizard-step-title">Upload Verification Documents</h3>
+              <p class="wizard-step-subtitle">Please submit identity proof and financial statements to scan credentials.</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 0.7fr 1.3fr; gap: 2rem; margin-bottom: 1.5rem; align-items: center;">
+              <div>
+                <img src="images/kyc_verification.png" alt="KYC scan" style="width: 100%; border-radius: 15px; border: 1px solid var(--glass-border);" />
+              </div>
+              
+              <div style="display: flex; flex-direction: column; gap: 1.2rem;">
+                <!-- ID Proof Card -->
+                <div class="upload-zone glass-panel">
+                  <div class="upload-icon-label">
+                    <i data-lucide="shield-check" style="color: var(--accent-color); width: 20px; height: 20px;"></i>
+                    <span>Government Photo ID (Passport / Drivers License)</span>
+                  </div>
+                  
+                  <div id="id-upload-success" class="upload-success-label" style="display: none;">
+                    <i data-lucide="check-circle-2" style="color: #00ff87; width: 16px; height: 16px;"></i>
+                    <span id="id-upload-filename">national_identity_card.pdf</span>
+                  </div>
+                  
+                  <div id="id-upload-progress-wrap" class="upload-progress-wrapper" style="display: none;">
+                    <div class="file-progress-bar" id="id-upload-progress-bar" style="width: 0%;"></div>
+                    <span style="font-size: 0.75rem; color: var(--text-secondary);" id="id-upload-text">Uploading...</span>
+                  </div>
+                  
+                  <button id="id-upload-btn" class="glass-btn upload-action-btn">Attach ID File</button>
+                </div>
+
+                <!-- Income Proof Card -->
+                <div class="upload-zone glass-panel">
+                  <div class="upload-icon-label">
+                    <i data-lucide="file-text" style="color: #ff007f; width: 20px; height: 20px;"></i>
+                    <span>Proof of Income (Recent Paystub / Bank Statement)</span>
+                  </div>
+                  
+                  <div id="income-upload-success" class="upload-success-label" style="display: none;">
+                    <i data-lucide="check-circle-2" style="color: #00ff87; width: 16px; height: 16px;"></i>
+                    <span id="income-upload-filename">latest_paystub_verified.pdf</span>
+                  </div>
+                  
+                  <div id="income-upload-progress-wrap" class="upload-progress-wrapper" style="display: none;">
+                    <div class="file-progress-bar" id="income-upload-progress-bar" style="width: 0%;"></div>
+                    <span style="font-size: 0.75rem; color: var(--text-secondary);" id="income-upload-text">Uploading...</span>
+                  </div>
+                  
+                  <button id="income-upload-btn" class="glass-btn upload-action-btn">Attach Statement</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="wizard-btn-row">
+              <button class="glass-btn glass-btn-secondary" id="step3-back-btn">
+                <i data-lucide="arrow-left" style="width: 16px; height: 16px; margin-right: 4px;"></i>
+                Back
+              </button>
+              <button class="glass-btn glass-btn-primary disabled" id="step3-next-btn" disabled>
+                Scan Credentials
+                <i data-lucide="arrow-right" style="width: 16px; height: 16px; margin-left: 4px;"></i>
+              </button>
             </div>
           </div>
 
-          <!-- Step 4 Details (Approved congratz) -->
-          <div id="wizard-step-4" style="display: none;" class="congrats-card">
+          <!-- Step 4 Details (Checking status loader) -->
+          <div id="wizard-step-4" style="display: none;">
+            <div class="simulation-loading">
+              <div class="loading-ring"></div>
+              <h3 class="wizard-step-title" style="margin-top: 1rem;">Verifying Credit Status</h3>
+              <p class="wizard-step-subtitle" style="text-align: center; max-width: 380px; margin-bottom: 1.5rem;">
+                Scanning credentials and conducting real-time risk profile analysis...
+              </p>
+              
+              <!-- Real-time scanning log console -->
+              <div class="ocr-log-console" id="ocr-log-console-container">
+                <div class="ocr-log-cursor"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 5 Details (Approved congratz) -->
+          <div id="wizard-step-5" style="display: none;" class="congrats-card">
             <div class="congrats-icon">
               <i data-lucide="check" style="width: 36px; height: 36px;"></i>
             </div>
@@ -851,6 +931,85 @@
               <button class="glass-btn glass-btn-primary" style="flex: 1;" id="dashboard-home-btn">
                 Dashboard Home
               </button>
+            </div>
+          </div>
+
+          <!-- Plaid Connector Overlay -->
+          <div class="plaid-connector-overlay glass-panel" id="plaid-overlay" style="display: none;">
+            <button class="plaid-close-btn" id="plaid-close-btn" aria-label="Close Plaid">
+              <i data-lucide="x" style="width: 18px; height: 18px;"></i>
+            </button>
+            <div class="plaid-header">
+              <img src="images/bank_connect.png" alt="Plaid connection illustration" class="plaid-illustration" />
+              <h3>Link Your Bank</h3>
+              <p>Verify your income instantly and receive a <b>0.3% APR interest discount</b> on your loan terms.</p>
+            </div>
+            
+            <div id="plaid-step-select">
+              <div class="plaid-body">
+                <span class="plaid-label">Select Your Bank Account</span>
+                <div class="plaid-bank-grid">
+                  <button class="plaid-bank-card" onclick="selectStaticBank('Chase')">
+                    <div class="bank-logo-placeholder">C</div>
+                    <span>Chase</span>
+                  </button>
+                  <button class="plaid-bank-card" onclick="selectStaticBank('Wells Fargo')">
+                    <div class="bank-logo-placeholder">W</div>
+                    <span>Wells Fargo</span>
+                  </button>
+                  <button class="plaid-bank-card" onclick="selectStaticBank('Bank of America')">
+                    <div class="bank-logo-placeholder">B</div>
+                    <span>Bank of America</span>
+                  </button>
+                  <button class="plaid-bank-card" onclick="selectStaticBank('Citi')">
+                    <div class="bank-logo-placeholder">C</div>
+                    <span>Citi</span>
+                  </button>
+                  <button class="plaid-bank-card" onclick="selectStaticBank('Capital One')">
+                    <div class="bank-logo-placeholder">C</div>
+                    <span>Capital One</span>
+                  </button>
+                  <button class="plaid-bank-card" onclick="selectStaticBank('US Bank')">
+                    <div class="bank-logo-placeholder">U</div>
+                    <span>US Bank</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div id="plaid-step-credentials" style="display: none;">
+              <div class="plaid-body">
+                <span class="plaid-label" id="plaid-bank-login-title">Log in to Online Banking</span>
+                <div class="plaid-form">
+                  <input type="text" placeholder="Username / Online ID" class="glass-input" />
+                  <input type="password" placeholder="Password" class="glass-input" style="margin-top: 0.8rem;" />
+                  <p class="plaid-disclaimer">Your login details are encrypted and never stored by AeroPay.</p>
+                  
+                  <div style="display: flex; gap: 1rem; margin-top: 1.2rem;">
+                    <button class="glass-btn glass-btn-secondary" style="flex: 1;" onclick="setPlaidStepStatic('select')">
+                      Back
+                    </button>
+                    <button class="glass-btn glass-btn-primary" style="flex: 1;" onclick="submitStaticPlaid()">
+                      Submit
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="plaid-step-loading" style="display: none;">
+              <div class="plaid-body central-loading">
+                <div class="loading-ring" style="width: 40px; height: 40px; border-width: 3px;"></div>
+                <p style="margin-top: 1rem;" id="plaid-loading-text">Connecting securely...</p>
+              </div>
+            </div>
+
+            <div id="plaid-step-success" style="display: none;">
+              <div class="plaid-body central-loading">
+                <div class="success-checkmark">✓</div>
+                <p style="color: #00ff87; font-weight: bold; font-size: 1.1rem; margin: 0.8rem 0 0.2rem 0;" id="plaid-success-title">Bank linked successfully!</p>
+                <p style="font-size: 0.85rem; color: var(--text-secondary);">Monthly Income verified: $6,200/mo</p>
+              </div>
             </div>
           </div>
         </div>

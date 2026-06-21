@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { X, ArrowRight, ArrowLeft, Check, Download, Landmark, Loader } from 'lucide-react'
+import { X, ArrowRight, ArrowLeft, Check, Download, Landmark, Loader, ShieldCheck, FileText, CheckCircle2, Lock } from 'lucide-react'
 import confetti from 'canvas-confetti'
 
 export default function ApplicationWizard({ loanType = 'personal', onClose, onApproved }) {
-  const [step, setStep] = useState(1) // 1: Personal, 2: Financial, 3: Verifying, 4: Approved
+  const [step, setStep] = useState(1) // 1: Personal, 2: Financial, 3: KYC, 4: Verifying, 5: Approved
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -20,39 +20,76 @@ export default function ApplicationWizard({ loanType = 'personal', onClose, onAp
   const [formErrors, setFormErrors] = useState({})
   const [referenceId, setReferenceId] = useState('')
 
+  // Plaid Integration States
+  const [plaidOpen, setPlaidOpen] = useState(false)
+  const [plaidStep, setPlaidStep] = useState('select') // select | credentials | loading | success
+  const [selectedBank, setSelectedBank] = useState('')
+  const [bankVerified, setBankVerified] = useState(false)
+
+  // Document Upload States
+  const [uploadedFiles, setUploadedFiles] = useState({ idProof: null, incomeProof: null })
+  const [uploading, setUploading] = useState({ idProof: false, incomeProof: false })
+  const [uploadProgress, setUploadProgress] = useState({ idProof: 0, incomeProof: 0 })
+
+  // Credit Bureau Scan Log states
+  const [logs, setLogs] = useState([])
+
   // Trigger loading verification, then congratulations
   useEffect(() => {
-    if (step === 3) {
-      const timer = setTimeout(() => {
-        setStep(4)
-        // Fire confetti!
-        confetti({
-          particleCount: 150,
-          spread: 80,
-          origin: { y: 0.6 },
-          colors: ['#00f2fe', '#f02fc2', '#00ff87', '#f5d061']
-        })
+    if (step === 4) {
+      setLogs([])
+      const logMessages = [
+        "Establishing secure connection to Federal Verification gateway...",
+        "Validating applicant SSN/National ID profile...",
+        "Scanning uploaded Government Photo ID for OCR validation...",
+        "Document match confirmed (100% confidence).",
+        "Connecting to credit rating agencies (Experian, TransUnion, Equifax)...",
+        "FICO credit history record parsed successfully.",
+        "Analyzing debt-to-income ratio and liabilities...",
+        "Calculating optimal interest rates and terms...",
+        "Final checklist approved. Ready for disbursal!"
+      ]
+      
+      let currentLogIdx = 0
+      const logTimer = setInterval(() => {
+        if (currentLogIdx < logMessages.length) {
+          setLogs(prev => [...prev, logMessages[currentLogIdx]])
+          currentLogIdx++
+        } else {
+          clearInterval(logTimer)
+          // Wait then move to Step 5
+          setTimeout(() => {
+            setStep(5)
+            // Fire confetti!
+            confetti({
+              particleCount: 150,
+              spread: 80,
+              origin: { y: 0.6 },
+              colors: ['#00f2fe', '#f02fc2', '#00ff87', '#f5d061']
+            })
 
-        const refId = `AP-${Math.floor(100000 + Math.random() * 900000)}`
-        setReferenceId(refId)
+            const refId = `AP-${Math.floor(100000 + Math.random() * 900000)}`
+            setReferenceId(refId)
 
-        if (onApproved) {
-          onApproved({
-            reference: refId,
-            amount: formData.requestedAmount,
-            tenure: formData.requestedTenure,
-            rate: calculateInterestRate(),
-            emi: estimatedEMI()
-          })
+            if (onApproved) {
+              onApproved({
+                reference: refId,
+                amount: formData.requestedAmount,
+                tenure: formData.requestedTenure,
+                rate: calculateInterestRate(),
+                emi: estimatedEMI()
+              })
+            }
+          }, 1000)
         }
-      }, 2500)
-      return () => clearTimeout(timer)
+      }, 600)
+      return () => clearInterval(logTimer)
     }
   }, [step])
 
   // Animate credit score wheel in final step
   useEffect(() => {
-    if (step === 4) {
+    if (step === 5) {
       let current = 300
       const target = 785
       const interval = setInterval(() => {
@@ -99,6 +136,8 @@ export default function ApplicationWizard({ loanType = 'personal', onClose, onAp
       setStep(2)
     } else if (step === 2 && validateStep2()) {
       setStep(3)
+    } else if (step === 3) {
+      setStep(4)
     }
   }
 
@@ -107,13 +146,18 @@ export default function ApplicationWizard({ loanType = 'personal', onClose, onAp
   }
 
   const calculateInterestRate = () => {
-    switch (loanType) {
-      case 'home': return 6.8
-      case 'auto': return 7.5
-      case 'education': return 5.5
-      case 'personal':
-      default: return 8.5
-    }
+    // If bank is verified, deduct 0.3% concession as benefit!
+    const baseRate = (() => {
+      switch (loanType) {
+        case 'home': return 6.8
+        case 'auto': return 7.5
+        case 'education': return 5.5
+        case 'personal':
+        default: return 8.5
+      }
+    })()
+    
+    return bankVerified ? parseFloat((baseRate - 0.3).toFixed(1)) : baseRate
   }
 
   const estimatedEMI = () => {
@@ -122,6 +166,27 @@ export default function ApplicationWizard({ loanType = 'personal', onClose, onAp
     const n = Number(formData.requestedTenure) || 36
     const emi = (P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1)
     return Math.round(emi)
+  }
+
+  // File Upload Simulator
+  const simulateFileUpload = (type) => {
+    setUploading(prev => ({ ...prev, [type]: true }))
+    setUploadProgress(prev => ({ ...prev, [type]: 10 }))
+    
+    let progress = 10
+    const interval = setInterval(() => {
+      progress += 30
+      if (progress >= 100) {
+        clearInterval(interval)
+        setUploading(prev => ({ ...prev, [type]: false }))
+        setUploadedFiles(prev => ({ 
+          ...prev, 
+          [type]: type === 'idProof' ? 'national_identity_card.pdf' : 'latest_paystub_verified.pdf' 
+        }))
+      } else {
+        setUploadProgress(prev => ({ ...prev, [type]: progress }))
+      }
+    }, 250)
   }
 
   // Pre-fill amount based on defaults
@@ -137,19 +202,21 @@ export default function ApplicationWizard({ loanType = 'personal', onClose, onAp
     }))
   }, [loanType])
 
+  const kycComplete = uploadedFiles.idProof && (bankVerified || uploadedFiles.incomeProof)
+
   return (
     <div className="modal-overlay">
-      <div className="modal-card glass-panel" style={{ padding: '2.5rem' }}>
+      <div className="modal-card glass-panel" style={{ padding: '2.5rem', position: 'relative' }}>
         <button onClick={onClose} className="modal-close-btn" aria-label="Close modal">
           <X size={22} />
         </button>
 
         {/* Step Indicator Bar */}
-        {step < 3 && (
+        {step < 4 && (
           <div className="wizard-progress-bar-container">
             <div 
               className="wizard-progress-fill" 
-              style={{ width: `${step === 1 ? 50 : 100}%` }}
+              style={{ width: `${(step / 3) * 100}%` }}
             ></div>
           </div>
         )}
@@ -158,7 +225,7 @@ export default function ApplicationWizard({ loanType = 'personal', onClose, onAp
         {step === 1 && (
           <div>
             <div className="wizard-step-header">
-              <span className="glass-badge" style={{ marginBottom: '0.5rem' }}>Step 1 of 2</span>
+              <span className="glass-badge" style={{ marginBottom: '0.5rem' }}>Step 1 of 3</span>
               <h3 className="wizard-step-title">Personal Profile</h3>
               <p className="wizard-step-subtitle">Tell us about yourself to begin your application for {loanType} credit.</p>
             </div>
@@ -236,12 +303,46 @@ export default function ApplicationWizard({ loanType = 'personal', onClose, onAp
         {step === 2 && (
           <div>
             <div className="wizard-step-header">
-              <span className="glass-badge" style={{ marginBottom: '0.5rem' }}>Step 2 of 2</span>
+              <span className="glass-badge" style={{ marginBottom: '0.5rem' }}>Step 2 of 3</span>
               <h3 className="wizard-step-title">Financial Profile</h3>
               <p className="wizard-step-subtitle">Provide details regarding your current earnings and credit size.</p>
             </div>
 
             <div className="wizard-form-grid">
+              <div className="glass-input-group">
+                <label className="glass-input-label">Income Verification Method</label>
+                {bankVerified ? (
+                  <div className="bank-verified-banner glass-panel">
+                    <CheckCircle2 size={20} color="#00ff87" />
+                    <div>
+                      <p style={{ fontWeight: '700', color: '#00ff87' }}>{selectedBank} Connected Instantly</p>
+                      <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Verified income details auto-populated.</p>
+                    </div>
+                    <button 
+                      onClick={() => {
+                        setBankVerified(false)
+                        setSelectedBank('')
+                      }}
+                      className="plaid-disconnect-btn"
+                    >
+                      Disconnect
+                    </button>
+                  </div>
+                ) : (
+                  <button 
+                    onClick={() => {
+                      setPlaidOpen(true)
+                      setPlaidStep('select')
+                    }}
+                    className="glass-btn bank-connector-trigger-btn"
+                    style={{ width: '100%', gap: '0.6rem' }}
+                  >
+                    <Lock size={16} color="#00f2fe" />
+                    Connect Bank via Plaid (Instantly Verify Income)
+                  </button>
+                )}
+              </div>
+
               <div className="glass-input-group">
                 <label className="glass-input-label">Employment Status</label>
                 <div style={{ display: 'flex', gap: '1rem' }}>
@@ -278,6 +379,8 @@ export default function ApplicationWizard({ loanType = 'personal', onClose, onAp
                     onChange={handleInputChange} 
                     placeholder="e.g. 5500"
                     className="glass-input" 
+                    disabled={bankVerified}
+                    style={bankVerified ? { opacity: 0.8, color: '#00ff87', fontWeight: 'bold' } : {}}
                   />
                   {formErrors.monthlyIncome && <span style={{ color: '#ff007f', fontSize: '0.8rem' }}>{formErrors.monthlyIncome}</span>}
                 </div>
@@ -329,26 +432,123 @@ export default function ApplicationWizard({ loanType = 'personal', onClose, onAp
                 Back
               </button>
               <button onClick={handleNext} className="glass-btn glass-btn-primary">
-                Analyze Eligibility
+                Next Step
                 <ArrowRight size={16} />
               </button>
             </div>
           </div>
         )}
 
-        {/* Step 3: Verifying Loader */}
+        {/* Step 3: KYC Upload (NEW!) */}
         {step === 3 && (
-          <div className="simulation-loading">
-            <div className="loading-ring"></div>
-            <h3 className="wizard-step-title" style={{ marginTop: '1rem' }}>Verifying Credit Status</h3>
-            <p className="wizard-step-subtitle" style={{ textAlign: 'center', maxWidth: '380px' }}>
-              We are simulating a background credit pull (FICO check), evaluating monthly debt ratio, and calculating your optimized terms.
-            </p>
+          <div>
+            <div className="wizard-step-header">
+              <span className="glass-badge" style={{ marginBottom: '0.5rem' }}>Step 3 of 3</span>
+              <h3 className="wizard-step-title">Upload Verification Documents</h3>
+              <p className="wizard-step-subtitle">Please submit identity proof and financial statements to scan credentials.</p>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '0.7fr 1.3fr', gap: '2rem', marginBottom: '1.5rem', alignItems: 'center' }}>
+              <div>
+                <img src="/images/kyc_verification.png" alt="KYC scan" style={{ width: '100%', borderRadius: '15px', border: '1px solid var(--glass-border)' }} />
+              </div>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                {/* ID Proof Card */}
+                <div className="upload-zone glass-panel">
+                  <div className="upload-icon-label">
+                    <ShieldCheck size={20} color="var(--accent-color)" />
+                    <span>Government Photo ID (Passport / Drivers License)</span>
+                  </div>
+                  
+                  {uploadedFiles.idProof ? (
+                    <div className="upload-success-label">
+                      <CheckCircle2 size={16} color="#00ff87" />
+                      <span>{uploadedFiles.idProof}</span>
+                    </div>
+                  ) : uploading.idProof ? (
+                    <div className="upload-progress-wrapper">
+                      <div className="file-progress-bar" style={{ width: `${uploadProgress.idProof}%` }}></div>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Uploading... {uploadProgress.idProof}%</span>
+                    </div>
+                  ) : (
+                    <button onClick={() => simulateFileUpload('idProof')} className="glass-btn upload-action-btn">
+                      Attach ID File
+                    </button>
+                  )}
+                </div>
+
+                {/* Income Proof Card */}
+                <div className="upload-zone glass-panel">
+                  <div className="upload-icon-label">
+                    <FileText size={20} color="#ff007f" />
+                    <span>Proof of Income (Recent Paystub / Bank Statement)</span>
+                  </div>
+                  
+                  {bankVerified ? (
+                    <div className="upload-success-label" style={{ color: '#00ff87' }}>
+                      <CheckCircle2 size={16} color="#00ff87" />
+                      <span>Automatically Verified via Plaid connection</span>
+                    </div>
+                  ) : uploadedFiles.incomeProof ? (
+                    <div className="upload-success-label">
+                      <CheckCircle2 size={16} color="#00ff87" />
+                      <span>{uploadedFiles.incomeProof}</span>
+                    </div>
+                  ) : uploading.incomeProof ? (
+                    <div className="upload-progress-wrapper">
+                      <div className="file-progress-bar" style={{ width: `${uploadProgress.incomeProof}%` }}></div>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Uploading... {uploadProgress.incomeProof}%</span>
+                    </div>
+                  ) : (
+                    <button onClick={() => simulateFileUpload('incomeProof')} className="glass-btn upload-action-btn">
+                      Attach Statement
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="wizard-btn-row">
+              <button onClick={handleBack} className="glass-btn glass-btn-secondary">
+                <ArrowLeft size={16} />
+                Back
+              </button>
+              <button 
+                onClick={handleNext} 
+                className={`glass-btn glass-btn-primary ${!kycComplete ? 'disabled' : ''}`}
+                disabled={!kycComplete}
+              >
+                Scan Credentials
+                <ArrowRight size={16} />
+              </button>
+            </div>
           </div>
         )}
 
-        {/* Step 4: Approved/Congratulations */}
+        {/* Step 4: Scanning Loader */}
         {step === 4 && (
+          <div className="simulation-loading">
+            <div className="loading-ring"></div>
+            <h3 className="wizard-step-title" style={{ marginTop: '1rem' }}>Verifying Credit Status</h3>
+            <p className="wizard-step-subtitle" style={{ textAlign: 'center', maxWidth: '380px', marginBottom: '1.5rem' }}>
+              Scanning credentials and conducting real-time risk profile analysis...
+            </p>
+            
+            {/* Real-time scanning log console */}
+            <div className="ocr-log-console">
+              {logs.map((log, idx) => (
+                <div key={idx} className="ocr-log-line">
+                  <span className="log-arrow">&gt;</span> {log}
+                </div>
+              ))}
+              <div className="ocr-log-cursor"></div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 5: Approved/Congratulations */}
+        {step === 5 && (
           <div className="congrats-card">
             <div className="congrats-icon">
               <Check size={36} />
@@ -390,7 +590,10 @@ export default function ApplicationWizard({ loanType = 'personal', onClose, onAp
               </div>
               <div className="sanction-line">
                 <span>Annual Interest Rate:</span>
-                <span>{calculateInterestRate()}% p.a.</span>
+                <span style={{ color: '#00ff87' }}>
+                  {calculateInterestRate()}% p.a. 
+                  {bankVerified && <span style={{ fontSize: '0.75rem', marginLeft: '0.3rem', color: '#00f2fe' }}>(Plaid discount applied)</span>}
+                </span>
               </div>
               <div className="sanction-line" style={{ borderTop: '1px dashed var(--glass-border)', paddingTop: '0.5rem', fontWeight: '600' }}>
                 <span>Estimated Monthly EMI:</span>
@@ -413,6 +616,90 @@ export default function ApplicationWizard({ loanType = 'personal', onClose, onAp
                 Dashboard Home
               </button>
             </div>
+          </div>
+        )}
+
+        {/* 5. Plaid Bank Connector micro-modal */}
+        {plaidOpen && (
+          <div className="plaid-connector-overlay glass-panel">
+            <button onClick={() => setPlaidOpen(false)} className="plaid-close-btn" aria-label="Close Plaid">
+              <X size={18} />
+            </button>
+            <div className="plaid-header">
+              <img src="/images/bank_connect.png" alt="Plaid logo" className="plaid-illustration" />
+              <h3>Link Your Bank</h3>
+              <p>Verify your income instantly and receive a <b>0.3% APR interest discount</b> on your loan terms.</p>
+            </div>
+            
+            {plaidStep === 'select' && (
+              <div className="plaid-body">
+                <span className="plaid-label">Select Your Bank Account</span>
+                <div className="plaid-bank-grid">
+                  {['Chase', 'Wells Fargo', 'Bank of America', 'Citi', 'Capital One', 'US Bank'].map(bank => (
+                    <button
+                      key={bank}
+                      className="plaid-bank-card"
+                      onClick={() => {
+                        setSelectedBank(bank)
+                        setPlaidStep('credentials')
+                      }}
+                    >
+                      <div className="bank-logo-placeholder">{bank[0]}</div>
+                      <span>{bank}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {plaidStep === 'credentials' && (
+              <div className="plaid-body">
+                <span className="plaid-label">Log in to {selectedBank} Online Banking</span>
+                <div className="plaid-form">
+                  <input type="text" placeholder="Username / Online ID" className="glass-input" />
+                  <input type="password" placeholder="Password" className="glass-input" style={{ marginTop: '0.8rem' }} />
+                  <p className="plaid-disclaimer">Your login details are encrypted and never stored by AeroPay.</p>
+                  
+                  <div style={{ display: 'flex', gap: '1rem', marginTop: '1.2rem' }}>
+                    <button className="glass-btn glass-btn-secondary" onClick={() => setPlaidStep('select')} style={{ flex: 1 }}>
+                      Back
+                    </button>
+                    <button
+                      className="glass-btn glass-btn-primary"
+                      onClick={() => {
+                        setPlaidStep('loading')
+                        setTimeout(() => {
+                          setPlaidStep('success')
+                          setBankVerified(true)
+                          setFormData(prev => ({ ...prev, monthlyIncome: '6200' }))
+                          setTimeout(() => {
+                            setPlaidOpen(false)
+                          }, 1200)
+                        }, 2000)
+                      }}
+                      style={{ flex: 1 }}
+                    >
+                      Submit
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {plaidStep === 'loading' && (
+              <div className="plaid-body central-loading">
+                <div className="loading-ring" style={{ width: '40px', height: '40px', borderWidth: '3px' }}></div>
+                <p style={{ marginTop: '1rem' }}>Connecting securely to {selectedBank}...</p>
+              </div>
+            )}
+
+            {plaidStep === 'success' && (
+              <div className="plaid-body central-loading">
+                <div className="success-checkmark">✓</div>
+                <p style={{ color: '#00ff87', fontWeight: 'bold', fontSize: '1.1rem', margin: '0.8rem 0 0.2rem 0' }}>{selectedBank} linked successfully!</p>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Monthly Income verified: $6,200/mo</p>
+              </div>
+            )}
           </div>
         )}
       </div>
