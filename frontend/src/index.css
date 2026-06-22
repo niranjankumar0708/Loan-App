@@ -2111,8 +2111,29 @@ li {
   }
   
   .offers-grid {
-    grid-template-columns: 1fr;
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
     gap: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+  .offers-grid::-webkit-scrollbar {
+    height: 6px;
+  }
+  .offers-grid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+  }
+  .offers-grid::-webkit-scrollbar-thumb {
+    background: var(--glass-border-hover);
+    border-radius: 10px;
+  }
+  .offer-card {
+    flex: 0 0 290px;
+    scroll-snap-align: start;
+    margin: 0 !important;
   }
   
   .products-grid {
