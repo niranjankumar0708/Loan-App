@@ -2400,15 +2400,14 @@ li {
   100% { transform: translateY(0) rotate(0deg) scale(1); }
 }
 
-/* ==========================================================================
-   Exclusive Partner Banners & Offers Section
-   ========================================================================== */
-.offers-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 2.5rem;
-  max-width: 1200px;
-  margin: 0 auto;
+@media (min-width: 769px) {
+  .offers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
 }
 
 .offer-card {
