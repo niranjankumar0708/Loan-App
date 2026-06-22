@@ -327,7 +327,7 @@
               </div>
 
               <!-- Direct input boxes -->
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem;">
+              <div class="calc-inputs-grid">
                 <div class="glass-input-group">
                   <span class="glass-input-label">Direct Amount Input</span>
                   <div style="position: relative;">
@@ -652,7 +652,7 @@
 
       <!-- Step-by-Step wizard overlay modal -->
       <div class="modal-overlay" id="wizard-modal" style="display: none;">
-        <div class="modal-card glass-panel" style="padding: 2.5rem;">
+        <div class="modal-card glass-panel">
           <button class="modal-close-btn" id="close-modal-btn" aria-label="Close modal">
             <i data-lucide="x" style="width: 22px; height: 22px;"></i>
           </button>
@@ -677,7 +677,7 @@
                 <span style="color: #ff007f; font-size: 0.8rem; display: none;" id="error-fullname"></span>
               </div>
 
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem;">
+              <div class="responsive-grid-2">
                 <div class="glass-input-group">
                   <label class="glass-input-label">Email Address</label>
                   <input type="email" id="wiz-email" placeholder="john@example.com" class="glass-input" />
@@ -750,7 +750,7 @@
                 </div>
               </div>
 
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem;">
+              <div class="responsive-grid-2">
                 <div class="glass-input-group">
                   <label class="glass-input-label">Monthly Take-Home Income ($)</label>
                   <input type="number" id="wiz-income" placeholder="e.g. 5500" class="glass-input" />
@@ -762,7 +762,7 @@
                 </div>
               </div>
 
-              <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 1.2rem;">
+              <div class="responsive-grid-1-5">
                 <div class="glass-input-group">
                   <label class="glass-input-label">Desired Amount ($)</label>
                   <input type="number" id="wiz-amount" class="glass-input" />
@@ -800,7 +800,7 @@
               <p class="wizard-step-subtitle">Please submit identity proof and financial statements to scan credentials.</p>
             </div>
 
-            <div style="display: grid; grid-template-columns: 0.7fr 1.3fr; gap: 2rem; margin-bottom: 1.5rem; align-items: center;">
+            <div class="responsive-grid-kyc" style="margin-bottom: 1.5rem;">
               <div>
                 <img src="images/kyc_verification.png" alt="KYC scan" style="width: 100%; border-radius: 15px; border: 1px solid var(--glass-border);" />
               </div>

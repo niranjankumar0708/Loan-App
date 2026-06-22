@@ -1142,14 +1142,14 @@ function checkActiveLoan() {
                 </div>
               </div>
 
-              <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 2rem; flex-wrap: wrap;">
+              <div class="dashboard-two-column">
                 <div style="background: rgba(255, 255, 255, 0.01); border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.2rem;" class="repayment-block-dyn">
                   <h4 style="font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; font-family: var(--font-family-title); margin: 0;">
                     <i data-lucide="credit-card" style="color: var(--accent-color); width: 16px; height: 16px;"></i>
                     Pending Repayment Summary
                   </h4>
 
-                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                  <div class="dashboard-inner-two-col">
                     <div>
                       <span style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase;">Remaining Balance</span>
                       <p style="font-size: 1.4rem; font-weight: 700; color: #ff007f; margin: 0.1rem 0 0 0;">${formatCurrency(outstandingBalance)}</p>
