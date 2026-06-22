@@ -82,11 +82,11 @@ export default function LandingPage({ onApplyClick }) {
               <span className="stat-number">2 Min</span>
               <span className="stat-label">Fast Approvals</span>
             </div>
-            <div className="stat-item" style={{ borderLeft: '1px solid var(--glass-border)', paddingLeft: '2.5rem' }}>
+            <div className="stat-item stat-item-bordered">
               <span className="stat-number">5.5%</span>
               <span className="stat-label">Starting APR</span>
             </div>
-            <div className="stat-item" style={{ borderLeft: '1px solid var(--glass-border)', paddingLeft: '2.5rem' }}>
+            <div className="stat-item stat-item-bordered">
               <span className="stat-number">100%</span>
               <span className="stat-label">Paperless Portal</span>
             </div>

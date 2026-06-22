@@ -154,7 +154,7 @@ export default function LoanCalculator({ onApplyClick }) {
           </div>
 
           {/* Value indicators */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginTop: '1rem' }}>
+          <div className="calc-inputs-grid">
             <div className="glass-input-group">
               <span className="glass-input-label">Direct Amount Input</span>
               <div style={{ position: 'relative' }}>

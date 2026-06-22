@@ -182,7 +182,7 @@ export default function ActiveLoanDashboard({ activeLoans = [], pastLoans = [], 
                 </div>
 
                 {/* Payments & Disbursal details */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: '2rem', flexWrap: 'wrap' }}>
+                <div className="dashboard-two-column">
                   {/* Left Column: Payments Section */}
                   <div style={{ background: 'rgba(255, 255, 255, 0.01)', border: '1px solid var(--glass-border)', borderRadius: '12px', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
                     <h4 style={{ fontSize: '0.95rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '0.5rem', fontFamily: 'var(--font-family-title)' }}>
@@ -190,7 +190,7 @@ export default function ActiveLoanDashboard({ activeLoans = [], pastLoans = [], 
                       Pending Repayment Summary
                     </h4>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                    <div className="dashboard-inner-two-col">
                       <div>
                         <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Remaining Balance</span>
                         <p style={{ fontSize: '1.4rem', fontWeight: '700', color: '#ff007f', marginTop: '0.1rem' }}>{formatCurrency(outstandingBalance)}</p>

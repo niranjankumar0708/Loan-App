@@ -244,7 +244,7 @@ export default function ApplicationWizard({ loanType = 'personal', onClose, onAp
                 {formErrors.fullName && <span style={{ color: '#ff007f', fontSize: '0.8rem' }}>{formErrors.fullName}</span>}
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.2rem' }}>
+              <div className="responsive-grid-2">
                 <div className="glass-input-group">
                   <label className="glass-input-label">Email Address</label>
                   <input 
@@ -369,7 +369,7 @@ export default function ApplicationWizard({ loanType = 'personal', onClose, onAp
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.2rem' }}>
+              <div className="responsive-grid-2">
                 <div className="glass-input-group">
                   <label className="glass-input-label">Monthly Take-Home Income ($)</label>
                   <input 
@@ -397,7 +397,7 @@ export default function ApplicationWizard({ loanType = 'personal', onClose, onAp
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '1.2rem' }}>
+              <div className="responsive-grid-1-5">
                 <div className="glass-input-group">
                   <label className="glass-input-label">Desired Amount ($)</label>
                   <input 
@@ -448,7 +448,7 @@ export default function ApplicationWizard({ loanType = 'personal', onClose, onAp
               <p className="wizard-step-subtitle">Please submit identity proof and financial statements to scan credentials.</p>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '0.7fr 1.3fr', gap: '2rem', marginBottom: '1.5rem', alignItems: 'center' }}>
+            <div className="responsive-grid-kyc" style={{ marginBottom: '1.5rem' }}>
               <div>
                 <img src="/images/kyc_verification.png" alt="KYC scan" style={{ width: '100%', borderRadius: '15px', border: '1px solid var(--glass-border)' }} />
               </div>

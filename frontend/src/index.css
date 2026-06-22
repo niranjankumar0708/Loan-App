@@ -1910,6 +1910,54 @@ li {
    Responsive Adaptations (Media Queries)
    ========================================================================== */
 
+/* Responsive Grid & Layout Utilities */
+.responsive-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+}
+
+.responsive-grid-1-5 {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 1.2rem;
+}
+
+.responsive-grid-kyc {
+  display: grid;
+  grid-template-columns: 0.7fr 1.3fr;
+  gap: 2rem;
+  align-items: center;
+}
+
+.calc-inputs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.dashboard-two-column {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 2rem;
+}
+
+.dashboard-inner-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.stat-item-bordered {
+  border-left: 1px solid var(--glass-border);
+  padding-left: 2.5rem;
+}
+
+.modal-card {
+  padding: 2.5rem;
+}
+
 /* Laptop / Desktop Large */
 @media (max-width: 1200px) {
   .hero-title {
@@ -1943,6 +1991,11 @@ li {
     gap: 4rem;
   }
   
+  .dashboard-two-column {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
   .timeline::after {
     left: 20px;
   }
@@ -1966,13 +2019,37 @@ li {
 
 /* Small Tablets / Mobiles */
 @media (max-width: 768px) {
+  :root {
+    --card-padding: 1.5rem;
+  }
+  
+  .modal-card {
+    padding: 1.5rem 1.25rem;
+  }
+  
+  .offer-card {
+    padding: 1.5rem !important;
+  }
+  
+  .navbar {
+    top: 1rem;
+    left: 1.5rem;
+    right: 1.5rem;
+    height: 4.2rem;
+    padding: 0 1.2rem;
+  }
+  
   .navbar-links {
     display: none; /* Hide menu links, implement mobile slideout if desired */
   }
   
+  .navbar-actions {
+    gap: 0.8rem;
+  }
+  
   .navbar-actions .glass-btn {
-    padding: 0.6rem 1.2rem;
-    font-size: 0.85rem;
+    padding: 0.5rem 1.1rem;
+    font-size: 0.82rem;
   }
   
   .navbar-logo {
@@ -2001,6 +2078,11 @@ li {
     font-size: 0.75rem;
   }
   
+  .stat-item-bordered {
+    border-left: none;
+    padding-left: 0;
+  }
+  
   .testimonial-card {
     padding: 1.8rem;
   }
@@ -2017,6 +2099,110 @@ li {
     flex-direction: column;
     gap: 1rem;
     text-align: center;
+  }
+  
+  .responsive-grid-2,
+  .responsive-grid-1-5,
+  .responsive-grid-kyc,
+  .calc-inputs-grid,
+  .dashboard-inner-two-col {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .offers-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .products-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .glass-card {
+    padding: 1.5rem;
+  }
+}
+
+/* Mobile Screens */
+@media (max-width: 576px) {
+  .navbar {
+    top: 0.5rem;
+    left: 10px;
+    right: 10px;
+    height: 4rem;
+    padding: 0 0.8rem;
+  }
+  
+  .navbar-actions {
+    gap: 0.5rem;
+  }
+  
+  .navbar-actions .glass-btn {
+    padding: 0.5rem 0.9rem;
+    font-size: 0.8rem;
+  }
+  
+  .theme-toggle-btn {
+    width: 2.2rem;
+    height: 2.2rem;
+  }
+  
+  .modal-overlay {
+    padding: 0.75rem;
+  }
+  
+  table th, table td {
+    padding: 0.6rem 0.4rem !important;
+    font-size: 0.78rem !important;
+  }
+}
+
+/* Extra Small Screens */
+@media (max-width: 480px) {
+  :root {
+    --card-padding: 1.25rem;
+  }
+  
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.8rem;
+  }
+  
+  .hero-actions .glass-btn, .hero-actions a {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .hero-title {
+    font-size: 2rem;
+  }
+  
+  .plaid-bank-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+}
+
+/* Very Small Screens */
+@media (max-width: 380px) {
+  .navbar {
+    left: 5px;
+    right: 5px;
+    padding: 0 0.5rem;
+  }
+  .navbar-logo {
+    font-size: 1.05rem;
+    gap: 0.3rem;
+  }
+  .navbar-actions {
+    gap: 0.4rem;
+  }
+  .navbar-actions .glass-btn {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.75rem;
   }
 }
 
