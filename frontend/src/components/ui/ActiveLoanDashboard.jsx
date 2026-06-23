@@ -15,7 +15,7 @@ export default function ActiveLoanDashboard({ activeLoans = [], pastLoans = [], 
   }
 
   return (
-    <div style={{ padding: '2rem 5% 0 5%', maxWidth: '1200px', margin: '8rem auto 0 auto', animation: 'modal-enter 0.5s ease-out' }}>
+    <div style={{ padding: '2rem 5% 0 5%', maxWidth: '1200px', width: '100%', boxSizing: 'border-box', margin: '8rem auto 0 auto', animation: 'modal-enter 0.5s ease-out' }}>
       
       {/* Active Loan Glass Cards */}
       {activeLoans && activeLoans.map((loan) => {
@@ -350,7 +350,7 @@ export default function ActiveLoanDashboard({ activeLoans = [], pastLoans = [], 
       )}
 
       {/* Exclusive Offers & Rewards Banners */}
-      <section id="offers" style={{ background: 'rgba(255,255,255,0.01)', padding: '2rem 0', marginTop: '3rem', borderTop: '1px solid var(--glass-border)' }}>
+      <section id="offers" style={{ background: 'rgba(255,255,255,0.01)', padding: '2rem 0', marginTop: '3rem', borderTop: '1px solid var(--glass-border)', width: '100%', maxWidth: '100%', boxSizing: 'border-box' }}>
         <div style={{ textAlign: 'center', maxWidth: '650px', margin: '0 auto 3rem auto', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           <span className="glass-badge" style={{ alignSelf: 'center' }}>EXCLUSIVE OFFERS</span>
           <h2 style={{ fontSize: '2.2rem', fontWeight: 800, fontFamily: 'var(--font-family-title)', color: 'var(--text-primary)', margin: 0 }}>Premium Partner Rewards</h2>

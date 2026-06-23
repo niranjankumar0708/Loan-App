@@ -2119,6 +2119,9 @@ li {
     -webkit-overflow-scrolling: touch;
     gap: 1.5rem;
     padding-bottom: 1.5rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
   .offers-grid::-webkit-scrollbar {
     height: 6px;
