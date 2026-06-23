@@ -2001,7 +2001,9 @@ li {
     left: 20px;
   }
   
-  .timeline-item {
+  .timeline-item,
+  .timeline-item:nth-child(even),
+  .timeline-item:nth-child(odd) {
     width: 100%;
     left: 0 !important;
     padding-left: 3rem !important;
@@ -2151,9 +2153,13 @@ li {
   }
   
   .finance-bg-graphic {
-    width: 340px;
-    height: 340px;
-    left: calc(50% - 170px);
+    width: 90vw;
+    height: 90vw;
+    max-width: 400px;
+    max-height: 400px;
+    left: 5%;
+    top: 25%;
+    background-size: contain;
   }
 }
 
