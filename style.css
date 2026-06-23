@@ -2003,6 +2003,7 @@ li {
   
   .timeline-item {
     width: 100%;
+    left: 0 !important;
     padding-left: 3rem !important;
     padding-right: 0 !important;
     text-align: left !important;
@@ -2147,6 +2148,12 @@ li {
   
   .glass-card {
     padding: 1.5rem;
+  }
+  
+  .finance-bg-graphic {
+    width: 340px;
+    height: 340px;
+    left: calc(50% - 170px);
   }
 }
 
